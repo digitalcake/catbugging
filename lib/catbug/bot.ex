@@ -1,9 +1,6 @@
 defmodule Catbug.Bot do
   use Slack
-  require IEx
 
-  # So we'll define a start_link function, and we'll defer to the
-  # Slack.start_link function, passing it our API Token
   def start_link(initial_state) do
     start_link(System.get_env("SLACK_BOT_API_TOKEN"), initial_state)
   end
@@ -27,47 +24,38 @@ defmodule Catbug.Bot do
     {:ok, state}
   end
 
-
-
+  # Handle found reply
   defp send_reply({:ok, reply}, channel, slack) do
     send_message(reply, channel, slack)
     :ok
   end
 
-  defp send_reply({:error}, _channel, _slack) do
+  # Handle unfound reply
+  defp send_reply({:no_match}, _channel, _slack) do
     IO.puts "no match"
     :ok
   end
 
   defp matcher(msg) do
-    # tacos = ~r/\btacos?\b/
-    # poop = ~r/\bpoop\b/
-    # drop = ~r/\bdrop it\b/
-    # snacks = ~r/\bsnacks?\b/
-    # rage = ~r/\brage\b/
-    # ok = ~r/\bok\b/
-    # ok2 = ~r/\bthumbsup\b/
-    # food = ~r/\bfood\b/
-    # boom = ~r/\bboom\b/
-    # dknow = ~r/\bdon'?t know\b/
-    # broke = ~r/\bbroken?\b/
-    # issue = ~r/\bissues?\b/
-    # believe = ~r/\bbelieve\b/
-    # pineapple = ~r/\bpineapple\b/
-    # beer = ~r/\bbeers?\b/
-    # resolved = ~r/\bresolved?\b/
-    # bad = ~r/\bbad\b/
-    # clap = ~r/\bclap\b/
-    # catbug = ~r/\bcatbug\b/
-
-    matcher = [
+    reply_map = [
       {:tacos, ~r/\btacos?\b/},
       {:believe, ~r/\bclap\b/},
       {:broke, ~r/\bbroken?\b/},
-      {:crash, ~r/\bcrash\b/}
+      {:crash, ~r/\bcrash\b/},
+      {:peanut, ~r/\bsnacks?\b/},
+      {:stick, ~r/\brage\b/},
+      {:more, ~r/\bfood\b/},
+      {:boom, ~r/\bboom\b/},
+      {:dknow, ~r/\bdon'?t know\b/},
+      {:issue, ~r/\bissues?\b/},
+      {:believe, ~r/\bbelieve\b/},
+      {:pineapple, ~r/\bpineapple\b/},
+      {:beer, ~r/\bbeers?\b/},
+      {:why, ~r/\bbad\b/},
+      {:hello, ~r/\bcatbug\b/}
     ]
 
-    message_list = %{
+    replies = %{
       hello: "My name is Catbug! What's yours?! http://static.tumblr.com/8ddc18737d36c0425f9da80a3f6a815c/be2tqlj/eIlmlmmgi/tumblr_static_9zklg4r_1_.gif",
       why: "Why would you do that? http://38.media.tumblr.com/a90a275fa910f26fa9532c5b9b9036bd/tumblr_inline_o0lzg5HZML1tj1p0i_500.gif",
       tacos: "You're my friends now. We're having soft tacos later! https://45.media.tumblr.com/62b167879a37b87de49e6bf7b7c23af7/tumblr_n2gb89SmGu1r922pyo1_1280.gif",
@@ -84,12 +72,12 @@ defmodule Catbug.Bot do
       broke: "Put a little fence around it!"
     }
 
-    match_it(matcher, message_list, msg)
-
+    match_it(reply_map, replies, msg)
   end
 
+
   defp match_it([], _, _) do
-    {:error}
+    {:no_match}
   end
 
   defp match_it([h|t], list, msg) do
