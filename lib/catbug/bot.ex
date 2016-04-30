@@ -22,9 +22,8 @@ defmodule Catbug.Bot do
     {:ok, state}
   end
 
-  def handle_message(_message, _slack, state) do
-    {:ok, state}
-  end
+  # Why do I need this if handle_message is also defined at deps/slack/lib/slack.ex:146 ?
+  def handle_message(_message, _slack, state), do: {:ok, state}
 
   defp send_reply(nil, _channel, _slack) do
     {:ok}
