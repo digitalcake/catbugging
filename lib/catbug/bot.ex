@@ -13,7 +13,7 @@ defmodule Catbug.Bot do
     {:ok, state}
   end
 
-  def handle_message(message = %{type: "message", user: user}, slack = %{me: %{id: user}}, state) do
+  def handle_message(%{type: "message", user: user}, %{me: %{id: user}}, state) do
     IO.puts "wow that was me?!"
     {:ok, state}
   end
@@ -28,13 +28,14 @@ defmodule Catbug.Bot do
   end
 
 
-  defp send_reply({:error}, channel, slack) do
-    IO.puts "no match"
-    :ok
-  end
 
   defp send_reply({:ok, reply}, channel, slack) do
     send_message(reply, channel, slack)
+    :ok
+  end
+
+  defp send_reply({:error}, _channel, _slack) do
+    IO.puts "no match"
     :ok
   end
 
