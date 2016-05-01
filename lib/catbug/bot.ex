@@ -1,16 +1,6 @@
 defmodule Catbug.Bot do
-  use Slack
   import Catbug.Bot.Speak
-
-  def start_link(initial_state) do
-    start_link(System.get_env("SLACK_BOT_API_TOKEN"), initial_state)
-  end
-
-  def handle_connect(slack, state) do
-    IO.puts "Connected as #{slack.me.name}"
-    {:ok, state}
-  end
-
+  import Slack
   # Don't handle your own messages silly
   def handle_message(%{type: "message", user: user}, slack = %{me: %{id: user}}, state) do
     IO.puts "wow that was me?!"
@@ -22,15 +12,22 @@ defmodule Catbug.Bot do
     {:ok, state}
   end
 
-  # Why do I need this if handle_message is also defined at deps/slack/lib/slack.ex:146 ?
-  def handle_message(_message, _slack, state), do: {:ok, state}
-
   defp send_reply(nil, _channel, _slack) do
     {:ok}
   end
 
   defp send_reply(reply, channel, slack) do
     send_message(reply, channel, slack)
+  end
+
+  use Slack
+  def start_link(initial_state) do
+    start_link(System.get_env("SLACK_BOT_API_TOKEN"), initial_state)
+  end
+
+  def handle_connect(slack, state) do
+    IO.puts "Connected as #{slack.me.name}"
+    {:ok, state}
   end
 
 end
